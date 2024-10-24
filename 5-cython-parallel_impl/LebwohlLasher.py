@@ -52,8 +52,8 @@ def savedat(arr, nsteps, Ts, runtime, ratio, energy, order, nmax, numthreads):
     print("# Size of lattice:     {:d}x{:d}".format(nmax,nmax),file=FileOut)
     print("# Number of MC steps:  {:d}".format(nsteps),file=FileOut)
     print("# Reduced temperature: {:5.3f}".format(Ts),file=FileOut)
-    print("# Run time (s):        {:8.6f}".format(runtime),file=FileOut)
     print("# Number of threads:   {:d}".format(numthreads),file=FileOut)
+    print("# Run time (s):        {:8.6f}".format(runtime),file=FileOut)
     print("#=====================================================",file=FileOut)
     print("# MC step:  Ratio:     Energy:   Order:",file=FileOut)
     print("#=====================================================",file=FileOut)
@@ -87,7 +87,7 @@ def main(program, nsteps, nmax, temp, pflag, numthreads):
     final = time.time()
     runtime = final - initial
     
-    print(f"{program}: Size: {nmax}, Steps: {nsteps}, T*: {temp}, Order: {order[nsteps-1]:.2f}, Time: {runtime} s")
+    print(f"{program}: Size: {nmax}, Steps: {nsteps}, T*: {temp}, Order: {order[nsteps-1]:.2f}, Thread Count: {numthreads}, Time: {runtime} s")
     
     savedat(lattice, nsteps, temp, runtime, ratio, energy, order, nmax, numthreads)
     plotdat(lattice, pflag, nmax)
