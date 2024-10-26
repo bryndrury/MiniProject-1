@@ -109,9 +109,8 @@ double get_order(const std::vector< std::vector< double > > &arr, int nmax)
 {
     std::vector< std::vector< double > > Qab(3, std::vector< double >(3, 0.0));
     // Equivalent to -> np.eye(3) in python
-    std::vector< std::vector< double > > delta(3, std::vector< double >(3, 0.0));
-    for (int i = 0; i < 3; i++)
-        delta[i][i] = 1;
+    std::vector< std::vector< double > > delta = { {1, 0 , 0}, {0, 1, 0}, {0, 0, 1} };;
+
 
     std::vector< std::vector< std::vector< double > > > lab(3, std::vector< std::vector< double > >(nmax, std::vector< double >(nmax , 0.0) ));
 
