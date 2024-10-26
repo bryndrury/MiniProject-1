@@ -128,3 +128,56 @@ def MC_step(double[:, :] arr, double Ts, int nmax, int numthreads):
     
     return accept / (nmax * nmax)
     
+@cython.boundscheck(False)
+cdef savedat(double[:, :] arr, int nsteps, double Ts, double runtime, double[:] energy, double[:] ratio, double[:] order, int nmax, int nthreads):
+    current_datetime  = datetime.datetime.now().strftime("%a-%d-%b-%Y-at-%I-%M-%S%p")
+    filename = f"LL-Output-{current_datetime}.txt"
+    FileOut = open(filename, "w")
+    
+    print("#=====================================================",file=FileOut)
+    print("# File created:        {:s}".format(current_datetime),file=FileOut)
+    print("# Size of lattice:     {:d}x{:d}".format(nmax,nmax),file=FileOut)
+    print("# Number of MC steps:  {:d}".format(nsteps),file=FileOut)
+    print("# Reduced temperature: {:5.3f}".format(Ts),file=FileOut)
+    print("# Number of threads:   {:d}".format(nthreads),file=FileOut)
+    print("# Run time (s):        {:8.6f}".format(runtime),file=FileOut)
+    print("#=====================================================",file=FileOut)
+    print("# MC step:  Ratio:     Energy:   Order:",file=FileOut)
+    print("#=====================================================",file=FileOut)
+    
+    for i in range(nsteps+1):
+        print("   {:05d}    {:6.4f} {:12.4f}  {:6.4f} ".format(i,ratio[i],energy[i],order[i]),file=FileOut)
+    FileOut.close()
+    
+@cython.boundscheck(True)
+def LebwohlLasher(int nsteps, int nmax, double temp, int pflag, int nthreads):
+    
+    cdef double[:, :] lattice = np.random.random_sample( (nmax, nmax) ) * 2 * M_PI
+    
+    initial_lattice = np.copy(lattice)
+    
+    energy  = np.zeros(nsteps+1)
+    ratio   = np.zeros(nsteps+1)
+    order   = np.zeros(nsteps+1)
+    
+    energy[0]   = all_energy(lattice, nmax, nthreads)
+    ratio[0]    = 0.5
+    order[0]    = get_order(lattice, nmax, nthreads)
+    
+    initial = time.time()
+    
+    for iter in range(1, nsteps+1):
+        print(f" Step: {iter}", end="\r")
+        
+        ratio[iter] = MC_step(lattice, temp, nmax, nthreads)
+        energy[iter] = all_energy(lattice, nmax, nthreads)
+        order[iter] = get_order(lattice, nmax, nthreads)
+        
+    final = time.time()
+    runtime = final - initial
+    
+    print(f"LebwohlLasher: Size: {nmax}, Steps: {nsteps}, T*: {temp}, Order: {order[nsteps-1]:.2f}, Thread Count: {nthreads}, Time: {runtime} s")
+    
+    savedat(lattice, nsteps, temp, runtime, ratio, energy, order, nmax, nthreads)
+    
+    return initial_lattice, lattice

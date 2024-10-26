@@ -4,7 +4,7 @@ import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from LebwohlLasher import all_energy, get_order, MC_step, one_energy_py
+from LebwohlLasher import LebwohlLasher, all_energy, get_order, MC_step, one_energy_py
 
 def initdat(nmax):
     arr = np.random.random_sample((nmax, nmax))*2.0*np.pi
@@ -44,7 +44,7 @@ def plotdat(arr, pflag, nmax):
     
 def savedat(arr, nsteps, Ts, runtime, ratio, energy, order, nmax, numthreads):
     current_datetime  = datetime.datetime.now().strftime("%a-%d-%b-%Y-at-%I-%M-%S%p")
-    filename = f"LL-Output-{current_datetime}.txt"
+    filename = f"Python-LL-Output-{current_datetime}.txt"
     FileOut = open(filename, "w")
     
     print("#=====================================================",file=FileOut)
@@ -78,7 +78,7 @@ def main(program, nsteps, nmax, temp, pflag, numthreads):
     initial = time.time()
     
     for iter in range(1, nsteps+1):
-        print(f"Step: {iter}", end="\r")
+        print(f" Step: {iter}", end="\r")
         
         ratio[iter] = MC_step(lattice, temp, nmax, numthreads)
         energy[iter] = all_energy(lattice, nmax, numthreads)
@@ -94,14 +94,20 @@ def main(program, nsteps, nmax, temp, pflag, numthreads):
 
 
 if __name__ == '__main__':
-    if int(len(sys.argv)) == 6:
+    if int(len(sys.argv)) == 7:
         PROGRAM = sys.argv[0]
         ITERATIONS = int(sys.argv[1])
         SIZE = int(sys.argv[2])
         TEMPERATURE = float(sys.argv[3])
         PLOTFLAG = int(sys.argv[4])
         NUMTHREADS = int(sys.argv[5])
+        ABSTRACT = int(sys.argv[6])
         
-        main(PROGRAM, ITERATIONS, SIZE, TEMPERATURE, PLOTFLAG, NUMTHREADS)
+        if ABSTRACT:
+            print("Running Lebwohl-Lasher model with Cython Abstraction")
+            init_arr, arr = LebwohlLasher(ITERATIONS, SIZE, TEMPERATURE, PLOTFLAG, NUMTHREADS)
+        else:
+            print("Running Lebwohl-Lasher model with Python")
+            main(PROGRAM, ITERATIONS, SIZE, TEMPERATURE, PLOTFLAG, NUMTHREADS)
     else:
-        print(f"Usage: python {sys.argv[0]} <ITERATIONS> <SIZE> <TEMPERATURE> <PLOTFLAG> <THREADCOUNT>")
+        print(f"Usage: python {sys.argv[0]} <ITERATIONS> <SIZE> <TEMPERATURE> <PLOTFLAG> <THREADCOUNT> <ABSTRACTION>")
