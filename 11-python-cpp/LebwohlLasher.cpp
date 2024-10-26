@@ -226,6 +226,7 @@ bool savedat(std::vector< std::vector< double > > &arr, int nsteps, double Ts, d
 
     file << "#=====================================================" << std::endl;
     file << "# File created:        " << std::put_time(ltm, "%a-%d-%b-%Y-at-%I-%M-%S%p") << std::endl;
+    file << "# Program:             CPP-Lebwohl-Lasher" << std::endl;
     file << "# Size of lattice:     " << nmax << "x" << nmax << std::endl;
     file << "# Number of MC steps:  " << nsteps << std::endl;
     file << "# Reduced temperature: " << std::fixed << std::setprecision(3) << Ts << std::endl;
@@ -247,14 +248,9 @@ bool savedat(std::vector< std::vector< double > > &arr, int nsteps, double Ts, d
     return true;
 }
 
-bool LebwohlLasher(std::string program, int nsteps, int nmax, double temp, int threadcount) 
+bool LebwohlLasher(std::vector< std::vector< double > > &lattice, std::string program, int nsteps, int nmax, double temp, int threadcount) 
 {
     omp_set_num_threads(threadcount);
-
-    auto setup_timer = std::chrono::high_resolution_clock::now();
-    // Initialize and Populate lattice
-    std::vector< std::vector< double > > lattice(nmax, std::vector< double >(nmax, 0.0));
-    initdat(lattice, nmax, 2 * M_PI);
 
     std::vector< double > energy(nsteps + 1, 0.0);
     std::vector< double > ratio(nsteps + 1, 0.0);
@@ -264,7 +260,6 @@ bool LebwohlLasher(std::string program, int nsteps, int nmax, double temp, int t
     ratio[0] = 0.5;
     order[0] = get_order(lattice, nmax);
 
-    std::cout << "Setup Time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - setup_timer).count()*1e-9<< std::endl;
     auto initial_time = std::chrono::high_resolution_clock::now();
 
     for (int iter = 1; iter < nsteps+1; iter++)
@@ -278,48 +273,10 @@ bool LebwohlLasher(std::string program, int nsteps, int nmax, double temp, int t
     auto final_time = std::chrono::high_resolution_clock::now();
     double runtime = std::chrono::duration_cast<std::chrono::nanoseconds>(final_time- initial_time).count();
 
-    std::cout << program << ": Size: " << nmax << ", Steps: " << nsteps << ", T*: " << temp << ", Order: " << order[nsteps-1] << ", Time: " << runtime*1e-9 << std::endl;
+    std::cout << program << ": Size: " << nmax << ", Steps: " << nsteps << ", T*: " << temp << ", Order: " << order[nsteps-1] << ", Thread Count: " << threadcount << ", Time: " << runtime*1e-9 << std::endl;
     savedat(lattice, nsteps, temp, runtime*1e-9, ratio, energy, order, nmax);
     return EXIT_SUCCESS;
 }
 
 
 
-// Python Wrappers for the function:
-// bool LebwohlLasher(std::string program, int nsteps, int nmax, double temp, bool pflag)
-
-// https://docs.python.org/3/extending/extending.html
-
-static PyObject* py_LebwohlLasher(PyObject* self, PyObject* args) 
-{
-    const char* program;
-    int nsteps;
-    int nmax;
-    double Ts;
-    int threadcount;
-
-    if (!PyArg_ParseTuple(args, "siidi", &program, &nsteps, &nmax, &Ts, &threadcount)) {
-        return NULL;
-    }
-
-    bool result = LebwohlLasher(program, nsteps, nmax, Ts, threadcount);
-    return Py_BuildValue("b", result);
-}
-
-static PyMethodDef LebwohlLasherMethods[] = {
-    {"LebwohlLasher", py_LebwohlLasher, METH_VARARGS, "Run the Lebwohl-Lasher simulation"},
-    {NULL, NULL, 0, NULL}
-};
-
-static struct PyModuleDef LebwohlLasherModule = {
-    PyModuleDef_HEAD_INIT,
-    "LebwohlLasher",
-    NULL,
-    -1,
-    LebwohlLasherMethods
-};
-
-PyMODINIT_FUNC PyInit_LebwohlLasher(void) 
-{
-    return PyModule_Create(&LebwohlLasherModule);
-}
