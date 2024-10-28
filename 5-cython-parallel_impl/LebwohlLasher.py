@@ -4,7 +4,7 @@ import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from LebwohlLasher import LebwohlLasher, all_energy, get_order, MC_step, one_energy_py
+from LebwohlLasher_pyx import LebwohlLasher, all_energy, get_order, MC_step, one_energy_py
 
 def initdat(nmax):
     arr = np.random.random_sample((nmax, nmax))*2.0*np.pi
