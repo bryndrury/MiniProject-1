@@ -113,7 +113,6 @@ def one_energy(arr,ix,iy,nmax):
     
     return en
 
-
 def MC_step(arr, Ts, nmax):
     scale = 0.1 + Ts
     accept = 0
@@ -121,7 +120,7 @@ def MC_step(arr, Ts, nmax):
     # Pre-compute random numbers
     xran = np.random.randint(0, high=nmax, size=(nmax, nmax))
     yran = np.random.randint(0, high=nmax, size=(nmax, nmax))
-    aran = np.random.normal(scale=scale, size=(nmax, nmax))
+    aran = np.random.normal(loc=0.0, scale=scale, size=(nmax, nmax))
 
     # Compute initial energies
     en0 = np.zeros((nmax, nmax))

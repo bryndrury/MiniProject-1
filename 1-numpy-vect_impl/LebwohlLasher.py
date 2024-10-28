@@ -66,6 +66,18 @@ def initdat(nmax):
     arr = np.vectorize(lambda x: x * 2 * np.pi)(arr)
     return arr
 
+def one_energy(arr, ix, iy, nmax):
+    ixp = (ix + 1) % nmax
+    ixm = (ix - 1) % nmax
+    iyp = (iy + 1) % nmax
+    iym = (iy - 1) % nmax
+
+    neighbours = np.array([[ixp, iy], [ixm, iy], [ix, iyp], [ix, iym]])
+    angle = arr[ix, iy] - arr[neighbours[:, 0], neighbours[:, 1]]
+    en = 0.5 * np.sum(1.0 - 3.0 * np.cos(angle) ** 2)
+
+    return en
+
 def all_energy(arr, nmax):
     arr_right       = np.roll(arr, -1, axis=1)
     arr_left        = np.roll(arr,  1, axis=1)
@@ -94,19 +106,6 @@ def get_order(arr, nmax):
 
     eigenvalues = np.linalg.eigvalsh(Qab)
     return eigenvalues.max()
-
-def one_energy(arr,ix,iy,nmax):
-    en = 0.0
-    ixp = (ix+1) % nmax # These are the coordinates
-    ixm = (ix-1) % nmax # of the neighbours
-    iyp = (iy+1) % nmax # with wraparound
-    iym = (iy-1) % nmax # 
-    
-    neighbours = [(ixp, iy), (ixm, iy), (ix, iyp), (ix, iym)]
-    angles = arr[ix, iy] - np.array([arr[nx, ny] for nx, ny in neighbours])
-    en = 0.5 * np.sum(1.0 - 3.0 * np.cos(angles)**2)
-    
-    return en
 
 def MC_step(arr, Ts, nmax):
     scale = 0.1 + Ts

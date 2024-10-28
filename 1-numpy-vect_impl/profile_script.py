@@ -1,7 +1,8 @@
 import cProfile
 import pstats
 import io
-from LebwohlLasher_np import main  # Import your main function
+import numpy as np
+from LebwohlLasher import main, all_energy, get_order  # Import your main function
 
 def profile_code():
     # Arguments for the main function
