@@ -14,7 +14,7 @@ omp_lib = os.popen('brew --prefix libomp').read().strip() + '/lib'
 
 extensions = [
     Extension(
-        "LebwohlLasher",
+        "LebwohlLasher_cython",
         ["LebwohlLasher.pyx"],
         include_dirs=[omp_include, np.get_include()],
         extra_compile_args=["-fopenmp", "-std=c++2a", "-O3"],
@@ -23,7 +23,7 @@ extensions = [
 ]
 
 setup(
-    name="LebwohlLasher",
+    name="LebwohlLasher_cython",
     ext_modules=cythonize(extensions),
     version="0.1",
     classifiers=[

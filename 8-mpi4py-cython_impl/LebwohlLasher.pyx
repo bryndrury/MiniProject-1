@@ -105,7 +105,7 @@ def MC_step(double[:, :] arr, double Ts, int nmax, int rank, int size, int numth
     cdef double scale = 0.1 + Ts
     cdef double accept = 0.0
     
-    cdef int[:, :] xran = np.random.randint(0, high=nmax, size=(nmax, nmax), dtype=np.int32)
+    cdef int[:, :] xran = np.random.randint(start, high=end, size=(nmax, nmax), dtype=np.int32)
     cdef int[:, :] yran = np.random.randint(0, high=nmax, size=(nmax, nmax), dtype=np.int32)
     cdef double[:, :] aran = np.random.normal(scale=scale, size=(nmax, nmax))
     

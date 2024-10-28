@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from mpi4py import MPI
-from LebwohlLasher import LebwohlLasher, all_energy, get_order, MC_step, one_energy_py
+from LebwohlLasher_cython import LebwohlLasher, all_energy, get_order, MC_step, one_energy_py
 
 # Compile with:
 # python setup.py build_ext --inplace
