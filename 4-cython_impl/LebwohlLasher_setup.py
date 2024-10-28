@@ -3,6 +3,8 @@ from distutils.extension import Extension
 from Cython.Build import cythonize
 import numpy as np
 
+# python LebwohlLasher_setup.py build_ext --inplace
+
 ext_modules = [
     Extension(
         "LebwohlLasher_c",

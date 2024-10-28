@@ -156,6 +156,7 @@ def MC_step(np.ndarray[np.float64_t, ndim=2] arr, double Ts, int nmax):
 @cython.wraparound(False) 
 def main(str program, int nsteps, int nmax, double temp, int pflag):
     cdef np.ndarray[np.float64_t, ndim=2] lattice = initdat(nmax)
+    cdef np.ndarray[np.float64_t, ndim=2] initial_lattice = lattice.copy()
     
     cdef np.ndarray[np.float64_t, ndim=1] energy = np.zeros(nsteps+1, dtype=np.float64)
     cdef np.ndarray[np.float64_t, ndim=1] ratio = np.zeros(nsteps+1, dtype=np.float64)
@@ -178,3 +179,5 @@ def main(str program, int nsteps, int nmax, double temp, int pflag):
     
     print("{}: Size: {:d}, Steps: {:d}, T*: {:5.3f}: Order: {:5.3f}, Time: {:8.6f} s".format(program, nmax,nsteps,temp,order[nsteps-1],runtime))
     savedat(lattice, nsteps, temp, runtime, energy, ratio, order, nmax)
+    
+    return initial_lattice, lattice
