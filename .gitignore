@@ -1,2 +1,8 @@
 
 /.vscode
+*.txt
+*.json
+*.so
+*.c
+*.o
+*.DS_Store
